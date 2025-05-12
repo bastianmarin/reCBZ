@@ -87,24 +87,34 @@ def save(book):
     # fix suffix when source has two suffixes (kobo epub)
     try:
         actual_stem = reCBZ.KEPUB_EPUB.match(book.fp.name).group(0)
-        # suffix = '.kepub.epub'
     except AttributeError:
         actual_stem = book.fp.stem
-        # suffix = book.fp.suffix
 
-    # Determine output directory
+    # Determine output directory and extension
     output_dir = config.output_directory if hasattr(config, 'output_directory') and config.output_directory else None
+    archive_ext = config.archive_format
+    if archive_ext == "epub" and config.ebook_profile is not None:
+        archive_ext = config.ebook_profile.epub_ext.lstrip(".")
+    # Remove any trailing dot or extension from actual_stem
+    stem = actual_stem
+    if stem.endswith(f".{archive_ext}"):
+        stem = stem[:-(len(archive_ext)+1)]
+    if stem.endswith(" [reCBZ]"):
+        stem = stem[:-9]
+
     if not config.no_write:
         if config.overwrite:
-            name = str(Path.joinpath(book.fp.parents[0], actual_stem))
+            name = str(Path.joinpath(book.fp.parents[0], f"{stem} [reCBZ]"))
             book.fp.unlink()
         else:
-            # Use specified output directory if present
             if output_dir:
                 Path(output_dir).mkdir(parents=True, exist_ok=True)
-                name = str(Path.joinpath(Path(output_dir), f'{actual_stem} [reCBZ]'))
+                name = str(Path.joinpath(Path(output_dir), f"{stem} [reCBZ]"))
             else:
-                name = str(Path.joinpath(Path.cwd(), f'{actual_stem} [reCBZ]'))
+                name = str(Path.joinpath(Path.cwd(), f"{stem} [reCBZ]"))
+        # Ensure extension is correct and not duplicated
+        if not name.endswith(f".{archive_ext}"):
+            name = f"{name}.{archive_ext}"
         new_fp = Path(book.write_archive(config.archive_format, file_name=name))
     else:
         new_fp = book.fp

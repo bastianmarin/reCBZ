@@ -50,12 +50,9 @@ def write_epub(savepath, chapters):
     title = Path(savepath).stem
     mylog(f'Write .epub: {title}.epub', progress=True)
     if len(chapters) > 1:
-        savepath = epub.multi_chapter_epub(title, chapters)
+        savepath = epub.multi_chapter_epub(savepath, chapters)
     else:
-        savepath = epub.single_chapter_epub(title, pages)
-
-    # if Config.compress_zip:
-    #     ZipFile(savepath, mode='w', compression=ZIP_DEFLATED, compresslevel=9).write(savepath)
+        savepath = epub.single_chapter_epub(savepath, pages)
     return savepath
 
 

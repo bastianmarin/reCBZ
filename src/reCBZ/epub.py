@@ -18,6 +18,7 @@
 # non-commerical private use is explicitly permitted.
 # WORK IN PROGRESS
 from uuid import uuid4
+from pathlib import Path
 
 from ebooklib import epub
 
@@ -27,7 +28,8 @@ import reCBZ.config as config
 POP_COVER = True
 
 
-def single_chapter_epub(name:str, pages:list) -> str:
+def single_chapter_epub(output_path:str, pages:list) -> str:
+    name = Path(output_path).stem
     book = epub.EpubBook()
 
     # attempt to distinguish author / title
@@ -106,15 +108,13 @@ def single_chapter_epub(name:str, pages:list) -> str:
     if config.ebook_profile is not None:
         for tag in config.ebook_profile.epub_properties:
             book.add_metadata(*tag)
-        source_fp = f'{name}{config.ebook_profile.epub_ext}'
-    else:
-        source_fp = f'{name}.epub'
 
-    epub.write_epub(source_fp, book, {})
-    return source_fp
+    epub.write_epub(output_path, book, {})
+    return output_path
 
 
-def multi_chapter_epub(name:str, chapters:list) -> str:
+def multi_chapter_epub(output_path:str, chapters:list) -> str:
+    name = Path(output_path).stem
     book = epub.EpubBook()
 
     if ' - ' in name:
@@ -180,9 +180,6 @@ def multi_chapter_epub(name:str, chapters:list) -> str:
     if config.ebook_profile is not None:
         for tag in config.ebook_profile.epub_properties:
             book.add_metadata(*tag)
-        source_fp = f'{name}{config.ebook_profile.epub_ext}'
-    else:
-        source_fp = f'{name}.epub'
 
-    epub.write_epub(source_fp, book, {})
-    return source_fp
+    epub.write_epub(output_path, book, {})
+    return output_path
