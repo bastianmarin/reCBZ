@@ -95,8 +95,10 @@ def save(book):
     archive_ext = config.archive_format
     if archive_ext == "epub" and config.ebook_profile is not None:
         archive_ext = config.ebook_profile.epub_ext.lstrip(".")
+
     # Remove any trailing dot or extension from actual_stem
     stem = actual_stem
+    
     # Remove known epub extensions (e.g., .epub, .kepub.epub) from the end
     for ext in ('.kepub.epub', '.epub'):
         if stem.endswith(ext):
@@ -116,10 +118,13 @@ def save(book):
                 name = str(Path.joinpath(Path(output_dir), f"{stem} [reCBZ]"))
             else:
                 name = str(Path.joinpath(Path.cwd(), f"{stem} [reCBZ]"))
-        # Ensure extension is correct and not duplicated
-        if not name.endswith(f".{archive_ext}"):
-            name = f"{name}.{archive_ext}"
+
+        # Remove any existing extension before adding the new one
+        name_path = Path(name)
+        name = str(name_path.with_suffix(''))  # Remove any extension
         new_fp = Path(book.write_archive(config.archive_format, file_name=name))
+
+
     else:
         new_fp = book.fp
     book.cleanup()
