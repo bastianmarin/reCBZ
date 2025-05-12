@@ -97,6 +97,10 @@ def save(book):
         archive_ext = config.ebook_profile.epub_ext.lstrip(".")
     # Remove any trailing dot or extension from actual_stem
     stem = actual_stem
+    # Remove known epub extensions (e.g., .epub, .kepub.epub) from the end
+    for ext in ('.kepub.epub', '.epub'):
+        if stem.endswith(ext):
+            stem = stem[:-len(ext)]
     if stem.endswith(f".{archive_ext}"):
         stem = stem[:-(len(archive_ext)+1)]
     if stem.endswith(" [reCBZ]"):
