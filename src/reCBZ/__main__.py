@@ -246,6 +246,12 @@ def main():
         dest="show_version",
         action="store_true",
         help="show version and exit")
+    others_group.add_argument( "--directory",
+        default=None,
+        dest="output_directory",
+        metavar="",
+        type=str,
+        help="path of the output directory")
     process_group = ('process', 'sequential')
     mutually_exclusive_groups.append(process_group)
 
@@ -283,6 +289,12 @@ def main():
         except ValueError:
             print(f'{reCBZ.CMDNAME}: profile: invalid option "{prof_name}"')
             exit(1)
+
+    # NUEVO: establecer el directorio de salida si se especificó
+    if args.output_directory is not None:
+        config.output_directory = args.output_directory
+        if not Path(args.output_directory).exists():
+            Path(args.output_directory).mkdir(parents=True, exist_ok=True)
 
     if args.size_str is not None:
         newsize = args.size_str.lower().strip()

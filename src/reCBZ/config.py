@@ -1,5 +1,6 @@
 import os
 from importlib import resources
+from pathlib import Path
 
 try:
     import tomllib
@@ -34,6 +35,7 @@ no_downscale:bool = _cfg["image"]["no_downscale"]
 grayscale:bool = _cfg["image"]["grayscale"]
 blacklisted_fmts:str = _cfg["image"]["blacklisted_fmts"]
 ebook_profile = None
+output_directory = None  # Nuevo: directorio de salida
 
 
 def pcount() -> int:
@@ -87,6 +89,14 @@ def allowed_page_formats() -> tuple:
     valid_fmts = tuple(fmt for fmt in FormatList if fmt.name not in blacklist)
     assert len(valid_fmts) >= 1, "valid_formats is 0"
     return valid_fmts
+
+
+def set_output_directory(directory: str):
+    global output_directory
+    if directory:
+        output_directory = directory
+        if not Path(directory).exists():
+            Path(directory).mkdir(parents=True, exist_ok=True)
 
 
 _preload_profile = _cfg["archive"]["ebook_profile"]

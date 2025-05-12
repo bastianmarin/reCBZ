@@ -91,13 +91,20 @@ def save(book):
     except AttributeError:
         actual_stem = book.fp.stem
         # suffix = book.fp.suffix
+
+    # Determine output directory
+    output_dir = config.output_directory if hasattr(config, 'output_directory') and config.output_directory else None
     if not config.no_write:
         if config.overwrite:
             name = str(Path.joinpath(book.fp.parents[0], actual_stem))
             book.fp.unlink()
-        # elif savedir TODO
         else:
-            name = str(Path.joinpath(Path.cwd(), f'{actual_stem} [reCBZ]'))
+            # Use specified output directory if present
+            if output_dir:
+                Path(output_dir).mkdir(parents=True, exist_ok=True)
+                name = str(Path.joinpath(Path(output_dir), f'{actual_stem} [reCBZ]'))
+            else:
+                name = str(Path.joinpath(Path.cwd(), f'{actual_stem} [reCBZ]'))
         new_fp = Path(book.write_archive(config.archive_format, file_name=name))
     else:
         new_fp = book.fp
